@@ -56,7 +56,9 @@
 #ifdef __cplusplus
  extern "C" {
 #endif 
-  
+
+#define USE_STDPERIPH_DRIVER
+
 /** @addtogroup Library_configuration_section
   * @{
   */

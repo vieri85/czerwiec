@@ -7,7 +7,9 @@
   ******************************************************************************/
   
 /* Includes ------------------------------------------------------------------*/
+#include "inttypes.h"
 #include "stm32f0xx.h"
+uint8_t fdd=0;
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,6 +33,10 @@ int main(void)
      */
 
   /* GPIOC Periph clock enable */
+	if(fdd==0)
+	{
+		fdd=15;
+	}
 	RCC->AHBENR |= RCC_AHBENR_GPIOCEN; 
 
   

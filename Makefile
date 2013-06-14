@@ -33,6 +33,9 @@ CSRC = $(sort \
    src/main.c \
    src/stm32f0xx_it.c \
    src/system_stm32f0xx.c \
+   src/graphic/ST7565R.c \
+   src/init_function/init.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)
@@ -53,6 +56,9 @@ ASRC = $(sort \
 HDRLOC = $(sort $(dir $(CSRC)) $(dir $(CXXSRC)) \
    inc \
    inc/CMSIS \
+   inc/STM32F0xx_StdPeriph_Driver/inc \
+   inc/CMSIS/Device/ST/STM32F0xx/Include \
+   inc/CMSIS/Include \
    )
 
 ####################################################################################################
@@ -221,8 +227,9 @@ help :
 # targets
 ####################################################################################################
 .PHONY : micro
-micro : dependencies buildobjects linkobjects hex status
+micro : dependencies buildobjects linkobjects status
 
+#micro : dependencies buildobjects linkobjects hex status
 ####################################################################################################
 # create basic output files like hex, bin, lst etc.
 ####################################################################################################
@@ -339,6 +346,7 @@ cleantarget :
 clean :
 	@echo "Deleting all build files..."
 	-@$(RM) -r $(BIN_LOC)/*
+	@echo "Done successfull!"
 
 ####################################################################################################
 # clean up project (remove all files who arent project files!)

@@ -30,12 +30,15 @@
 # INSERT HERE C SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)
 ####################################################################################################
 CSRC = $(sort \
-   src/main.c \
-   src/stm32f0xx_it.c \
-   src/system_stm32f0xx.c \
+   src/main//main.c \
+   src/main/stm32f0xx_it.c \
+   src/main/system_stm32f0xx.c \
    src/graphic/ST7565R.c \
    src/init_function/init.c \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_gpio.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_rcc.c \
+   src/common_use/common_use.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)
@@ -77,7 +80,7 @@ MCU = STM32F0XX
 OPT = s
 
 # linker script
-LD_SCRIPT_micro = linker/stm32f0_linker.ld
+LD_SCRIPT_micro = startup/stm32f0_linker.ld
 
 
 ####################################################################################################

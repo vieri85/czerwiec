@@ -36,7 +36,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx.h"
-#include "assert.h"
 
 /** @addtogroup STM32F0xx_StdPeriph_Driver
   * @{

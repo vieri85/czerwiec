@@ -8,7 +8,6 @@
 #ifndef INIT_H_
 #define INIT_H_
 #include <stdint.h>
-#include <assert.h>
 #include "stm32f0xx_misc.h"
 
 
@@ -16,11 +15,6 @@
 extern void usart_init(void);
 extern void init_gpio(void);
 extern void debug_pin_init(void);
-extern uint8_t letter_check(void);
-extern uint8_t new_receive_check(void);
-extern void new_receive_set(uint8_t value);
-extern void set_debug_pin(uint16_t debug_pin_nr);
-extern void reset_debug_pin(uint16_t debug_pin_nr);
 extern void init_devices(void);
 
 /* STM32F0_DISCOVERY board definitions */

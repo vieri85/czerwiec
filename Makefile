@@ -38,7 +38,10 @@ CSRC = $(sort \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_gpio.c \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_rcc.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_spi.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_misc.c \
    src/common_use/common_use.c \
+   src/scheduler/scheduler.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)
@@ -230,7 +233,7 @@ help :
 # targets
 ####################################################################################################
 .PHONY : micro
-micro : dependencies buildobjects linkobjects status
+micro : dependencies buildobjects linkobjects hex status
 
 #micro : dependencies buildobjects linkobjects hex status
 ####################################################################################################
@@ -263,11 +266,6 @@ status :
 	@$(MKDIR) $(INFO_LOC)
 	@#@if ! $(TEST) -f $(INFO_LOC)/build; then echo "0" > $(INFO_LOC)/build; fi
 	@#@echo $$(($$($(CAT) $(INFO_LOC)/build) + 1)) > $(INFO_LOC)/build
-
-	@echo '/* application version created automatically by $(THIS_MAKEFILE) */' > $(INFO_LOC)/version.h
-	@echo '#'ifndef DSYS_VERSION >> $(INFO_LOC)/version.h
-	@echo '#'define DSYS_VERSION `$(DATE) "+%Y%m%d"`UL >> $(INFO_LOC)/version.h
-	@echo '#'endif >> $(INFO_LOC)/version.h
 
 	@#echo "Build: `$(CAT) $(INFO_LOC)/build` `$(DATE) "+completed: %k:%M:%S"`"
 	@echo ",---------------------------."

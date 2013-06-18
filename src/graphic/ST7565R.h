@@ -46,6 +46,8 @@
 #include "stm32f0xx_rcc.h"
 #include "stm32f0xx_flash.h"
 #include "stm32f0xx_spi.h"
+#include "stm32f0xx_usart.h"
+
 
 
 enum ST7565R_CMD_DAT

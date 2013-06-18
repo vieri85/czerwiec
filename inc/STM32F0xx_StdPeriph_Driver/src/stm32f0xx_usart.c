@@ -34,10 +34,13 @@
         (#) Peripheral's alternate function: 
             (++) Connect the pin to the desired peripherals' Alternate 
                  Function (AF) using GPIO_PinAFConfig() function.
+
             (++) Configure the desired pin in alternate function by:
                  GPIO_InitStruct->GPIO_Mode = GPIO_Mode_AF.
+
             (++) Select the type, pull-up/pull-down and output speed via 
                  GPIO_PuPd, GPIO_OType and GPIO_Speed members.
+
             (++) Call GPIO_Init() function.        
         (#) Program the Baud Rate, Word Length , Stop Bit, Parity, Hardware 
             flow control and Mode(Receiver/Transmitter) using the SPI_Init()

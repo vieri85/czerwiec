@@ -220,7 +220,6 @@ void ST7565R_Write(u8 ucDatOrCmd, u8 ucData)
 void ST7565R_Init(void)
 {
 
-
     ST7565R_DAT = dat;
     ST7565R_CMD = cmd;
 

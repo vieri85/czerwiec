@@ -19,4 +19,3 @@ arm-none-eabi-gdb --quiet --batch -x gdbcmd ./01_binaries/micro/main.elf
 rm -f gdbcmd
 
 echo "Done."
-read

@@ -42,6 +42,7 @@ CSRC = $(sort \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_misc.c \
    src/common_use/common_use.c \
    src/scheduler/scheduler.c \
+   src/scheduler/task_functions.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)
@@ -371,4 +372,3 @@ flash :
 	@echo -e "target remote localhost:3333\nmonitor reset halt\nload\nmonitor reset halt\nq\ny\n" > $(BIN_LOC)/gdbcmd
 	@arm-none-eabi-gdb $(BIN_LOC)/micro/main.elf -x $(BIN_LOC)/gdbcmd
 	-@$(RM) $(BIN_LOC)/gdbcmd
-

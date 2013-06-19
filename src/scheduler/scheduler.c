@@ -7,7 +7,12 @@
 #include "scheduler.h"
 #include "common_use.h"
 
-uint32_t timer=0;
+
+
+timer_scheduler_t systick_timer;
+
+
+void scheduler_main(void);
 
 /**===========================================================================
 **
@@ -25,55 +30,38 @@ void SysTick_Handler(void)
 	else
     set_debug_pin(DEBUG_PIN_0);
 
-	timer++;
-	if(timer>1000)
-	{
-		USART_SendData(USART2, 0x67);
-		timer=0;
-	}
-
+	scheduler_main();
 }
 
-/* ToBeDone
 void scheduler_main(void)
 {
+	 ++systick_timer.timer_1000ms;
+	 ++systick_timer.timer_100ms;
+	 ++systick_timer.timer_10ms;
 
-	if(event_count_u8&1)
-	{
-		task_0();
-		event_count_u8&=~1;
-	}
+	 task_every_1ms();
 
-	if(event_count_u8&2)
-	{
-		task_1();
-		event_count_u8&=~2;
-	}
+	 if(systick_timer.timer_10ms>=10)
+	 {
+		 task_every_10ms();
+		 systick_timer.timer_10ms = 0;
+	 }
+
+	 if(systick_timer.timer_100ms>=100)
+	 {
+		 task_every_100ms();
+		 systick_timer.timer_100ms = 0;
+	 }
+
+	 if(systick_timer.timer_1000ms>=1000)
+	 {
+		 task_every_1000ms();
+		 systick_timer.timer_1000ms = 0;
+	 }
 
 
-	if(event_count_u8&4)
-	{
-		task_2();
-		event_count_u8&=~4;
-	}
+
 }
 
-void systic_perform(void)
-{
-	if(sched_au16[0]==tim_100us_u16)
-	{
-		event_count_u8|=1;
-	}
 
-	if(sched_au16[1]==tim_100us_u16)
-	{
-		event_count_u8|=2;
-	}
 
-	if(sched_au16[2]==tim_100us_u16)
-	{
-		event_count_u8|=4;
-	}
-++tim_100us_u16;
-}
-*/

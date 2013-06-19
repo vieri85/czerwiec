@@ -114,19 +114,6 @@ void uart_interface(void)
 	}
 }
 
-void delay (int a)
-{
-	volatile int i,j;
-
-	for (i=0 ; i < a ; i++)
-	{
-		//uart_interface();
-		j++;
-	}
-
-	return;
-}
-
 
 
 uint8_t letter_check(void)
@@ -156,20 +143,25 @@ void reset_debug_pin(uint16_t debug_pin_nr)
 
 void USART2_IRQHandler(void)
 {
+	static uint32_t register_interupt;
    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
    {
        letter = USART_ReceiveData(USART2);
        new_receive = 1;
    }
+   register_interupt = USART2->ISR;
 
-
-   // if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
-   // {
-   //    USART_SendData(USART1, T_Buff[T_Index++]);
-   //    if(T_Buff[T_Index-1] == 0x0d || T_Index == BUFF_SIZE)
-   //    {
-   //       USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-   //       T_Index = 0;
-   //    }
-   // }
 }
+
+
+void led_blinkin(void)
+{
+	if(RESET==GPIO_ReadOutputDataBit(GPIOC , GPIO_Pin_8))
+		/* Set PC8 and PC9 */
+		GPIOC->BSRR = BSRR_VAL;
+	else
+		GPIOC->BRR = BSRR_VAL;
+}
+
+
+

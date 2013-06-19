@@ -21,6 +21,7 @@
 #define KEY_PORT GPIOA
 #define KEY GPIO_Pin_0
 #define DEBUG_PORT GPIOB
+#define BSRR_VAL        0x0300
 /* Private macro */
 
 #define BIT00	(1<<0)
@@ -48,7 +49,7 @@ extern uint8_t new_receive_check(void);
 extern void new_receive_set(uint8_t value);
 extern void set_debug_pin(uint16_t debug_pin_nr);
 extern void reset_debug_pin(uint16_t debug_pin_nr);
-//extern
+extern void led_blinkin(void);
 //extern
 //extern
 //extern

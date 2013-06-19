@@ -9,13 +9,16 @@
 #define INIT_H_
 #include <stdint.h>
 #include "stm32f0xx_misc.h"
-
+#include "scheduler.h"
+#include "ST7565R.h"
 
 
 extern void usart_init(void);
 extern void init_gpio(void);
 extern void debug_pin_init(void);
 extern void init_devices(void);
+
+extern timer_scheduler_t systick_timer;
 
 /* STM32F0_DISCOVERY board definitions */
 #define LED_PORT GPIOC

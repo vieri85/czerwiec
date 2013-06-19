@@ -25,18 +25,6 @@ inline void init_general_gpio_UART(void)
 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 	  GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-
-//	  GPIOB->MODER |= (GPIO_MODER_MODER1_0 | GPIO_MODER_MODER0_0);
-//	  /* Configure PC8 and PC9 in output  mode  */
-//
-//	  GPIOB->OTYPER &= ~(GPIO_OTYPER_OT_0 | GPIO_OTYPER_OT_1) ;
-//	  // Ensure push pull mode selected--default
-//
-//	  GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR1|GPIO_OSPEEDER_OSPEEDR0);
-//	  //Ensure maximum speed setting (even though it is unnecessary)
-//
-//	  GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR0|GPIO_PUPDR_PUPDR1);
-//	  //Ensure all pull up pull down resistors are disabled
 }
 
 void debug_pin_init(void)
@@ -59,6 +47,7 @@ void debug_pin_init(void)
 	  GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_0);
 	  GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 }
+
 void usart_init(void)
 {
 	  USART_InitTypeDef USART_2_InitStruct;
@@ -80,9 +69,6 @@ void usart_init(void)
 	  USART_Init(USART2, &USART_2_InitStruct);
 
 	  init_general_gpio_UART();
-
-
-
 
 	  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 	  NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
@@ -160,17 +146,20 @@ void systick_init(void)
     SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
                      SysTick_CTRL_TICKINT_Msk   |
                      SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
+
+    systick_timer.timer_1000ms = 0;
+    systick_timer.timer_100ms = 0;
+    systick_timer.timer_10ms = 0;
 }
 
 void init_devices(void)
 {
 	debug_pin_init();
-
-	//TODO delete after debug (FIRA)
 	init_gpio();
 	init_gpio_blink_led();
 	systick_init();
 	usart_init();
+	ST7565R_Init();
 }
 
 

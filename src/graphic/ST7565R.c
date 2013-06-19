@@ -45,13 +45,15 @@ void ST7565R_GPIO_Init(void)
 
     /* Configure SPI1 pins: SCK, MISO and MOSI -------------------------------*/
     GPIO_InitStructure.GPIO_Pin = ST7565R_SCLK | ST7565R_SID;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
-
+    GPIO_PinAFConfig(GPIOA, ST7565R_SCLK, GPIO_AF_0);
+    GPIO_PinAFConfig(GPIOA, ST7565R_SID, GPIO_AF_0);
 
     GPIO_InitStructure.GPIO_Pin = ST7565R_RS | ST7565R_RST;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
 
 
@@ -67,8 +69,9 @@ void ST7565R_GPIO_Init(void)
     SPI_InitStructure.SPI_CRCPolynomial = 7;
 
 #if SPI_X==1
-   // SPI_Init(SPI1, &SPI_InitStructure);
-    //SPI_Cmd(SPI1, ENABLE);
+   SPI_Init(SPI1, &SPI_InitStructure);
+   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 ,ENABLE);
+   SPI_Cmd(SPI1, ENABLE);
 #endif
 
 #if SPI_X==2
@@ -98,16 +101,16 @@ void ST7565R_SPI_Writebyte(unsigned char ucByte)
 {
 
 #if SPI_X==1
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
-    {
-        ;
-    }
+//    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
+//    {
+//        ;
+//    }
     SPI_SendData8(SPI1, ucByte);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET)
-    {
-        ;
-    }
-    SPI_ReceiveData8(SPI1);
+//    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET)
+//    {
+//        ;
+//    }
+//    SPI_ReceiveData8(SPI1);
 #endif
 
 #if SPI_X==2

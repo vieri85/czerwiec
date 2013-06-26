@@ -12,6 +12,7 @@
 /*Global variable*/
 uint8_t new_receive = 0;
 static uint8_t letter=255;
+static uint8_t RDBI_adres=55;
 
 uint8_t BCD_TO_DEC(uint8_t* bufor,uint8_t *dec)
 {
@@ -116,6 +117,53 @@ void uart_interface(void)
 
 
 
+void RDBI_func(void)
+{
+	uint8_t send_data=0;
+	switch(RDBI_adres)
+	{
+		case 0:
+		{
+			send_data = (uint8_t)((SPI1->CR1)>>8);
+			break;
+		}
+		case 1:
+		{
+			send_data = (uint8_t)((SPI1->CR1));
+			break;
+		}
+		case 2:
+		{
+			send_data = (uint8_t)((SPI1->CR2)>>8);
+			break;
+		}
+		case 3:
+		{
+			send_data = (uint8_t)((SPI1->CR2));
+			break;
+		}
+		default:
+			break;
+
+	}
+
+//	if(RDBI_adres <= 3 )
+//	{
+//		USART_SendData(USART2, send_data);
+//	}
+//	else if(RDBI_adres != 255)
+//	{
+//		USART_SendData(USART2, send_data);
+//	}
+
+	if(new_receive == 1)
+	{
+		new_receive = 0;
+		USART_SendData(USART2, RDBI_adres);
+	}
+}
+
+
 uint8_t letter_check(void)
 {
 	return letter;
@@ -141,13 +189,14 @@ void reset_debug_pin(uint16_t debug_pin_nr)
 	  GPIO_ResetBits(DEBUG_PORT, debug_pin_nr);
 }
 
-void USART2_IRQHandler(void)
+void USART2_IRQHandler_com(void)
 {
-	static uint32_t register_interupt;
+   static uint32_t register_interupt;
    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
    {
        letter = USART_ReceiveData(USART2);
        new_receive = 1;
+       RDBI_adres = letter;
    }
    register_interupt = USART2->ISR;
 
@@ -161,6 +210,22 @@ void led_blinkin(void)
 		GPIOC->BSRR = BSRR_VAL;
 	else
 		GPIOC->BRR = BSRR_VAL;
+}
+
+
+//TBD
+void usart_task_operation(void)
+{
+	uint8_t usrt_send_buffor[10];
+	uint8_t current_buffor_byte;
+
+	if(1)
+	{
+		USART_SendData(USART2, ' ');
+	}
+
+
+
 }
 
 

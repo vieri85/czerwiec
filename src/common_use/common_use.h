@@ -50,8 +50,8 @@ extern void new_receive_set(uint8_t value);
 extern void set_debug_pin(uint16_t debug_pin_nr);
 extern void reset_debug_pin(uint16_t debug_pin_nr);
 extern void led_blinkin(void);
-//extern
-//extern
+extern void RDBI_func(void);
+extern void USART2_IRQHandler_com(void);
 //extern
 //extern
 //extern

@@ -61,8 +61,8 @@ void ST7565R_GPIO_Init(void)
     SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
     SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
     SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-    SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-    SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+    SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
+    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
     SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
     SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
@@ -235,8 +235,8 @@ void ST7565R_Init(void)
     ST7565R_Delay(500); /*延时等待上电*/
 	GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 
-
     ST7565R_GPIO_Init();
+
     ST7565R_RST_L;
     ST7565R_Delay(200);
     ST7565R_RST_H;

@@ -11,7 +11,7 @@
 #include "stm32f0xx_misc.h"
 #include "scheduler.h"
 #include "ST7565R.h"
-
+#include "common_use.h"
 
 extern void usart_init(void);
 extern void init_gpio(void);

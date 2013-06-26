@@ -122,44 +122,38 @@ void RDBI_func(void)
 	uint8_t send_data=0;
 	switch(RDBI_adres)
 	{
-		case 0:
+		case '1':
 		{
 			send_data = (uint8_t)((SPI1->CR1)>>8);
 			break;
 		}
-		case 1:
+		case '2':
 		{
 			send_data = (uint8_t)((SPI1->CR1));
 			break;
 		}
-		case 2:
+		case '3':
 		{
 			send_data = (uint8_t)((SPI1->CR2)>>8);
 			break;
 		}
-		case 3:
+		case '4':
 		{
 			send_data = (uint8_t)((SPI1->CR2));
 			break;
 		}
 		default:
+			send_data = 'A';
 			break;
+
 
 	}
 
-//	if(RDBI_adres <= 3 )
-//	{
-//		USART_SendData(USART2, send_data);
-//	}
-//	else if(RDBI_adres != 255)
-//	{
-//		USART_SendData(USART2, send_data);
-//	}
 
 	if(new_receive == 1)
 	{
 		new_receive = 0;
-		USART_SendData(USART2, RDBI_adres);
+		USART_SendData(USART2, send_data);
 	}
 }
 

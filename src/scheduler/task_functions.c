@@ -35,17 +35,12 @@ void task_every_1000ms(void)
 //	while( SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_TXE ) == RESET );
 //	ST7565R_Write(dat, dec_number);
 
-check =889;
-	cr1 = SPI1->CR1;
-	cr1 = SPI1->CR2;
-	sr = SPI1->SR;
-	uart_conf = USART2->CR1;
 
 	//spi send data
-	if(1 == (SPI1->SR & BIT01))
-	{
-		SPI1->DR = 128;
-	}
+    if(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == SET)
+    {
+    	SPI_SendData8(SPI1, 157);
+    }
 
 
 

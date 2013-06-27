@@ -30,16 +30,6 @@
 //*****************************************************************************
 void ST7565R_GPIO_Init(void)
 {
-#if SPI_MODE==SOFTWARE
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Pin = ST7565R_RS | ST7565R_RST | ST7565R_SID
-            | ST7565R_SCLK;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
-
-#else //SPI_MODE==HARDWARE
     GPIO_InitTypeDef GPIO_InitStructure;
     SPI_InitTypeDef SPI_InitStructure;
 
@@ -48,45 +38,13 @@ void ST7565R_GPIO_Init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
-    GPIO_PinAFConfig(GPIOA, ST7565R_SCLK, GPIO_AF_0);
-    GPIO_PinAFConfig(GPIOA, ST7565R_SID, GPIO_AF_0);
+
 
     GPIO_InitStructure.GPIO_Pin = ST7565R_RS | ST7565R_RST;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
 
-
-    /* SPI Configuration ----------------------------------------------------*/
-    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-    SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-    SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
-    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
-    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
-    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-    SPI_InitStructure.SPI_CRCPolynomial = 7;
-
-#if SPI_X==1
-   SPI_Init(SPI1, &SPI_InitStructure);
-   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 ,ENABLE);
-   SPI_Cmd(SPI1, ENABLE);
-#endif
-
-#if SPI_X==2
-    SPI_Init(SPI2, &SPI_InitStructure);
-    SPI_Cmd(SPI2, ENABLE);
-#endif
-
-#if SPI_X==3
-    SPI_Init(SPI3, &SPI_InitStructure);
-    SPI_Cmd(SPI3, ENABLE);
-#endif
-
-#endif
 }
-
 #if SPI_MODE==HARDWARE
 //*****************************************************************************
 //
@@ -100,40 +58,16 @@ void ST7565R_GPIO_Init(void)
 void ST7565R_SPI_Writebyte(unsigned char ucByte)
 {
 
-#if SPI_X==1
-//    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
-//    {
-//        ;
-//    }
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
+    {
+        ;
+    }
     SPI_SendData8(SPI1, ucByte);
-//    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET)
-//    {
-//        ;
-//    }
-//    SPI_ReceiveData8(SPI1);
-#endif
-
-#if SPI_X==2
-    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET)
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET)
     {
         ;
     }
-    SPI_SendData8(SPI2, ucByte);
-    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET)
-    {
-    	;
-    }
-    SPI_ReceiveData8(SPI2);
-#endif
-
-#if SPI_X==3
-    while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE) == RESET)
-        ;
-    SPI_SendData8(SPI3, ucByte);
-    while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_RXNE) == RESET)
-        ;
-    SPI_ReceiveData8(SPI3);
-#endif
+    SPI_ReceiveData8(SPI1);
 }
 
 #endif
@@ -222,21 +156,20 @@ void ST7565R_Write(u8 ucDatOrCmd, u8 ucData)
 //*****************************************************************************
 void ST7565R_Init(void)
 {
-
     ST7565R_DAT = dat;
     ST7565R_CMD = cmd;
-
+    //GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
     ST7565R_RS_L;
     ST7565R_RST_L;
     ST7565R_SID_L;
     ST7565R_SCLK_L;
+    GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 
-    GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
     ST7565R_Delay(500); /*延时等待上电*/
-	GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
+	 GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
+
 
     ST7565R_GPIO_Init();
-
     ST7565R_RST_L;
     ST7565R_Delay(200);
     ST7565R_RST_H;

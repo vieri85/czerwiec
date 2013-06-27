@@ -32,15 +32,14 @@ void task_every_1000ms(void)
 	static uint16_t check;
 	static uint16_t uart_conf;
 	dec_number++;
-//	while( SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_TXE ) == RESET );
-//	ST7565R_Write(dat, dec_number);
+	ST7565R_Display_16x32_Num(3, 2, 5);
 
 
 	//spi send data
-    if(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == SET)
-    {
-    	SPI_SendData8(SPI1, 157);
-    }
+//    if(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == SET)
+//    {
+//    	SPI_SendData8(SPI1, 157);
+//    }
 
 
 

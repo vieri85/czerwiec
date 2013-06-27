@@ -201,15 +201,6 @@ void systick_init(void)
 
 void spi_init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    /* Configure SPI1 pins: SCK, MISO and MOSI -------------------------------*/
-    GPIO_InitStructure.GPIO_Pin = ST7565R_SCLK | ST7565R_SID;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
-    GPIO_PinAFConfig(GPIOA, ST7565R_SCLK, GPIO_AF_0);
-    GPIO_PinAFConfig(GPIOA, ST7565R_SID, GPIO_AF_0);
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
@@ -225,8 +216,8 @@ void spi_init(void)
 	cr1_conf.cr1_bits.CRC_NEXT = 0;
 	cr1_conf.cr1_bits.LSB_FIRST =0;
 	cr1_conf.cr1_bits.MSTR = 1;
-	cr1_conf.cr1_bits.RX_ONLY =
-	cr1_conf.cr1_bits.BR = 4;  // prescaler: 32
+	cr1_conf.cr1_bits.RX_ONLY = 0;
+	cr1_conf.cr1_bits.BR = 5;  // prescaler: 64
 	cr1_conf.cr1_bits.SPE = 0; //Mozliwe ze trza po inicjalizacji pozostalych bitow ustawic i cr2
 	cr1_conf.cr1_bits.SSI = 1;
 	cr1_conf.cr1_bits.SSM = 1;
@@ -264,15 +255,16 @@ void st7565r_init_pins(void)
 
 void init_devices(void)
 {
-	//debug_pin_init();
+	debug_pin_init();
 	init_gpio();
 	init_gpio_blink_led();
 	systick_init();
 	usart_init();
 
-	//st7565r_init_pins();
-	//ST7565R_Init();
 	spi_init();
+	//st7565r_init_pins();
+	ST7565R_Init();
+
 }
 
 

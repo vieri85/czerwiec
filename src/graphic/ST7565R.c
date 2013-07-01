@@ -31,7 +31,6 @@
 void ST7565R_GPIO_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    SPI_InitTypeDef SPI_InitStructure;
 
     /* Configure SPI1 pins: SCK, MISO and MOSI -------------------------------*/
     GPIO_InitStructure.GPIO_Pin = ST7565R_SCLK | ST7565R_SID;
@@ -158,14 +157,13 @@ void ST7565R_Init(void)
 {
     ST7565R_DAT = dat;
     ST7565R_CMD = cmd;
-    //GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
     ST7565R_RS_L;
     ST7565R_RST_L;
     ST7565R_SID_L;
     ST7565R_SCLK_L;
     GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 
-    ST7565R_Delay(500); /*延时等待上电*/
+    ST7565R_Delay(500);
 	 GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
 
 

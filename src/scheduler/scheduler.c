@@ -10,10 +10,10 @@
 
 
 timer_scheduler_t systick_timer;
-
+uint32_t ms_delay_counter=0U;
 
 void scheduler_main(void);
-
+uint32_t check_ms_counter(void);
 /**===========================================================================
 **
 **  Abstract: SysTick interrupt handler
@@ -40,6 +40,7 @@ void scheduler_main(void)
 	 ++systick_timer.timer_10ms;
 
 	 task_every_1ms();
+	 ++ms_delay_counter;
 
 	 if(systick_timer.timer_10ms>=10)
 	 {
@@ -63,5 +64,18 @@ void scheduler_main(void)
 
 }
 
+void systic_delay_ms(uint32_t delay_ms_count)
+{
+	uint32_t fin_counter_u32;
 
+	fin_counter_u32 = delay_ms_count + check_ms_counter();
+	while(fin_counter_u32 != check_ms_counter())
+	{
+		;
+	}
+}
 
+uint32_t check_ms_counter(void)
+{
+	return ms_delay_counter;
+}

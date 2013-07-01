@@ -19,4 +19,19 @@ typedef struct
 	uint16_t timer_1000ms;
 }timer_scheduler_t;
 
+
+typedef enum
+{
+	DELAY_DONE,
+	DELAY_PENDING,
+	DELAY_IDLE
+
+}del_ms_state_t;
+
+typedef enum
+{
+	DELAY_START,
+	DELAY_STATE
+}del_cmd_t;
+
 #endif /* SCHEDULER_H_ */

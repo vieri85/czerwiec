@@ -16,6 +16,7 @@
 #include "ST7565R_Font.h"
 #include "ST7565R_Picture.h"
 #include "stm32f0xx_spi.h"
+#include "spi.h"
 
 #define DEBUG_PIN_0 GPIO_Pin_0
 #define DEBUG_PIN_1 GPIO_Pin_1
@@ -57,16 +58,7 @@ void ST7565R_GPIO_Init(void)
 void ST7565R_SPI_Writebyte(unsigned char ucByte)
 {
 
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
-    {
-        ;
-    }
-    SPI_SendData8(SPI1, ucByte);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET)
-    {
-        ;
-    }
-    SPI_ReceiveData8(SPI1);
+	spi_flush(&ucByte, 1);
 }
 
 #endif

@@ -202,44 +202,50 @@ void systick_init(void)
 void spi_init(void)
 {
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
-	spi_cr1_reg_t cr1_conf;
-	spi_cr2_reg_t cr2_conf;
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
 
-	cr1_conf.cr1_bits.BIDI_MODE = 0;
-	cr1_conf.cr1_bits.BIDI_OE = 1;
-	cr1_conf.cr1_bits.CPHA = 1;
-	cr1_conf.cr1_bits.CPOL = 1;
-	cr1_conf.cr1_bits.CRCL = 0;
-	cr1_conf.cr1_bits.CRC_EN = 0;
-	cr1_conf.cr1_bits.CRC_NEXT = 0;
-	cr1_conf.cr1_bits.LSB_FIRST =0;
-	cr1_conf.cr1_bits.MSTR = 1;
-	cr1_conf.cr1_bits.RX_ONLY = 0;
-	cr1_conf.cr1_bits.BR = 5;  // prescaler: 64
-	cr1_conf.cr1_bits.SPE = 0; //Mozliwe ze trza po inicjalizacji pozostalych bitow ustawic i cr2
-	cr1_conf.cr1_bits.SSI = 1;
-	cr1_conf.cr1_bits.SSM = 1;
+	  NVIC_InitTypeDef NVIC_InitStructure;
+		spi_cr1_reg_t cr1_conf;
+		spi_cr2_reg_t cr2_conf;
 
-	cr2_conf.cr2_bits.RXDMA_EN = 0;
-	cr2_conf.cr2_bits.TSDMA_EN = 0;
-	cr2_conf.cr2_bits.SSO_EN = 0;
-	cr2_conf.cr2_bits.NSSP = 0;
-	cr2_conf.cr2_bits.FRF = 0; //Motorolla mode ???
-	cr2_conf.cr2_bits.ERRIE = 0;
-	cr2_conf.cr2_bits.RXNEIE = 0;
-	cr2_conf.cr2_bits.TXEIE = 0; // ustaw na 1 gdy interrupt od pustego bufora Tx ma byc
-	cr2_conf.cr2_bits.DS = 7; //8bit ramka
-	cr2_conf.cr2_bits.FRXTH = 1;
-	cr2_conf.cr2_bits.LDMA_RX = 0;
-	cr2_conf.cr2_bits.LDMA_TX = 0;
+		cr1_conf.cr1_bits.BIDI_MODE = 0;
+		cr1_conf.cr1_bits.BIDI_OE = 1;
+		cr1_conf.cr1_bits.CPHA = 1;
+		cr1_conf.cr1_bits.CPOL = 1;
+		cr1_conf.cr1_bits.CRCL = 0;
+		cr1_conf.cr1_bits.CRC_EN = 0;
+		cr1_conf.cr1_bits.CRC_NEXT = 0;
+		cr1_conf.cr1_bits.LSB_FIRST =0;
+		cr1_conf.cr1_bits.MSTR = 1;
+		cr1_conf.cr1_bits.RX_ONLY = 0;
+		cr1_conf.cr1_bits.BR = 2;  // prescaler: 32
+		cr1_conf.cr1_bits.SPE = 0; //Mozliwe ze trza po inicjalizacji pozostalych bitow ustawic i cr2
+		cr1_conf.cr1_bits.SSI = 1;
+		cr1_conf.cr1_bits.SSM = 1;
+
+		cr2_conf.cr2_bits.RXDMA_EN = 0;
+		cr2_conf.cr2_bits.TSDMA_EN = 0;
+		cr2_conf.cr2_bits.SSO_EN = 0;
+		cr2_conf.cr2_bits.NSSP = 0;
+		cr2_conf.cr2_bits.FRF = 0; //Motorolla mode ???
+		cr2_conf.cr2_bits.ERRIE = 0;
+		cr2_conf.cr2_bits.RXNEIE = 0; //Do wy³aczenia!!!
+		cr2_conf.cr2_bits.TXEIE = 1; // ustaw na 1 gdy interrupt od pustego bufora Tx ma byc
+		cr2_conf.cr2_bits.DS = 7; //8bit ramka
+		cr2_conf.cr2_bits.FRXTH = 1;
+		cr2_conf.cr2_bits.LDMA_RX = 0;
+		cr2_conf.cr2_bits.LDMA_TX = 0;
 
 
-	//There is matter off sequence
-	SPI1->CR2 = cr2_conf.cr2_reg;
-	SPI1->CR1 = cr1_conf.cr1_reg;
-	SPI1->CR1 |= SPI_CR1_SPE;;
+		//There is matter off sequence
+		SPI1->CR2 = cr2_conf.cr2_reg;
+		SPI1->CR1 = cr1_conf.cr1_reg;
+		SPI1->CR1 |= SPI_CR1_SPE;
+		NVIC_InitStructure.NVIC_IRQChannel = SPI1_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStructure);
 }
 
 

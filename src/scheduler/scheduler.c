@@ -5,15 +5,15 @@
  *      Author: Bono
  */
 #include "scheduler.h"
-#include "common_use.h"
 
 
 
 timer_scheduler_t systick_timer;
-uint32_t ms_delay_counter=0U;
+uint16_t ms_delay_counter=0U;
 
 void scheduler_main(void);
-uint32_t check_ms_counter(void);
+uint8_t check_ms_counter(void);
+void reset_ms_counter(void);
 /**===========================================================================
 **
 **  Abstract: SysTick interrupt handler
@@ -25,11 +25,6 @@ uint32_t check_ms_counter(void);
 
 void SysTick_Handler(void)
 {
-	if(GPIO_ReadOutputDataBit(GPIOB,DEBUG_PIN_0))
-	reset_debug_pin(DEBUG_PIN_0);
-	else
-    set_debug_pin(DEBUG_PIN_0);
-
 	scheduler_main();
 }
 
@@ -64,18 +59,39 @@ void scheduler_main(void)
 
 }
 
-void systic_delay_ms(uint32_t delay_ms_count)
+void systic_delay_ms(uint16_t delay_ms_count)
 {
-	uint32_t fin_counter_u32;
-
-	fin_counter_u32 = delay_ms_count + check_ms_counter();
-	while(fin_counter_u32 != check_ms_counter())
+	reset_ms_counter();
+	for(;delay_ms_count <ms_delay_counter;)
 	{
-		;
+		__ASM volatile ("nop");
 	}
 }
 
-uint32_t check_ms_counter(void)
+uint8_t check_ms_counter(void)
 {
 	return ms_delay_counter;
 }
+
+void reset_ms_counter(void)
+{
+	ms_delay_counter = 0;
+}
+
+void systick_init(void)
+{
+	/*SET to 1ms period*/
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
+    SysTick->LOAD  = 16000;      									 /* set reload register */
+    NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
+    SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
+                     SysTick_CTRL_TICKINT_Msk   |
+                     SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
+
+    systick_timer.timer_1000ms = 0;
+    systick_timer.timer_100ms = 0;
+    systick_timer.timer_10ms = 0;
+}
+
+

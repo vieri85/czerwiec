@@ -8,6 +8,7 @@
 #include "stm32f0xx_usart.h"
 #include "stm32f0xx_rcc.h"
 #include "stm32f0xx_gpio.h"
+#include "scheduler.h"
 
 typedef union
 {
@@ -104,7 +105,7 @@ void usart_init(void)
 	  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
 
 
-	  USART_2_InitStruct.USART_BaudRate = 19200;
+	  USART_2_InitStruct.USART_BaudRate = 4800;
 	  USART_2_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None ;
 	  USART_2_InitStruct.USART_WordLength = USART_WordLength_8b;
 	  USART_2_InitStruct.USART_StopBits = USART_StopBits_1;
@@ -183,21 +184,7 @@ void init_gpio_blink_led(void)
 	//Ensure all pull up pull down resistors are disabled
 }
 
-void systick_init(void)
-{
-	/*SET to 1ms period*/
-	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
-    SysTick->LOAD  = 50000;      									 /* set reload register */
-    NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
-    SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
-    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
-                     SysTick_CTRL_TICKINT_Msk   |
-                     SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
 
-    systick_timer.timer_1000ms = 0;
-    systick_timer.timer_100ms = 0;
-    systick_timer.timer_10ms = 0;
-}
 
 void spi_init(void)
 {

@@ -44,6 +44,9 @@ CSRC = $(sort \
    src/scheduler/scheduler.c \
    src/scheduler/task_functions.c \
    src/spi_util/spi.c \
+   src/keyboard/keyboard.c \
+   src/menu/menu.c \
+   src/uart_utilities/uart_functions.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)

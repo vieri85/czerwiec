@@ -7,11 +7,10 @@
 
 /* include file */
 #include "common_use.h"
+#include "stm32f0xx_usart.h"
 
 
 /*Global variable*/
-uint8_t new_receive = 0;
-static uint8_t letter=255;
 static uint8_t RDBI_adres=55;
 
 uint8_t BCD_TO_DEC(uint8_t* bufor,uint8_t *dec)
@@ -30,7 +29,7 @@ uint8_t BCD_TO_DEC(uint8_t* bufor,uint8_t *dec)
 }
 
 
-
+#if 0
 void uart_interface(void)
 {
 
@@ -173,28 +172,20 @@ void new_receive_set(uint8_t value)
 	new_receive = value;
 }
 
-void set_debug_pin(uint16_t debug_pin_nr)
-{
-	GPIO_SetBits(DEBUG_PORT, debug_pin_nr);
-}
 
-void reset_debug_pin(uint16_t debug_pin_nr)
-{
-	  GPIO_ResetBits(DEBUG_PORT, debug_pin_nr);
-}
 
-void USART2_IRQHandler_com(void)
-{
-   static uint32_t register_interupt;
-   if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
-   {
-       letter = USART_ReceiveData(USART2);
-       new_receive = 1;
-       RDBI_adres = letter;
-   }
-   register_interupt = USART2->ISR;
-
-}
+//void USART2_IRQHandler_com(void)
+//{
+//   static uint32_t register_interupt;
+//   if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+//   {
+//       letter = USART_ReceiveData(USART2);
+//       new_receive = 1;
+//       RDBI_adres = letter;
+//   }
+//   register_interupt = USART2->ISR;
+//
+//}
 
 
 void led_blinkin(void)
@@ -221,6 +212,14 @@ void usart_task_operation(void)
 
 
 }
+#endif
 
+void set_debug_pin(uint16_t debug_pin_nr)
+{
+	GPIO_SetBits(DEBUG_PORT, debug_pin_nr);
+}
 
-
+void reset_debug_pin(uint16_t debug_pin_nr)
+{
+	  GPIO_ResetBits(DEBUG_PORT, debug_pin_nr);
+}

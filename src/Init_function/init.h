@@ -18,8 +18,6 @@ extern void init_gpio(void);
 extern void debug_pin_init(void);
 extern void init_devices(void);
 
-extern timer_scheduler_t systick_timer;
-
 /* STM32F0_DISCOVERY board definitions */
 #define LED_PORT GPIOC
 #define LED1 GPIO_Pin_9

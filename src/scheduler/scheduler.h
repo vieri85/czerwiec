@@ -10,6 +10,9 @@
 
 #include <stdint.h>
 #include "task_functions.h"
+#include "stm32f0xx_usart.h"
+#include "stm32f0xx_rcc.h"
+#include "stm32f0xx_gpio.h"
 
 
 typedef struct
@@ -33,5 +36,13 @@ typedef enum
 	DELAY_START,
 	DELAY_STATE
 }del_cmd_t;
+
+extern timer_scheduler_t systick_timer;
+
+
+
+extern void systic_delay_ms(uint16_t delay_ms_count);
+extern void systick_init(void);
+
 
 #endif /* SCHEDULER_H_ */

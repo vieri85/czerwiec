@@ -15,27 +15,332 @@
 #include "ST7565R.h"
 #include "ST7565R_Font.h"
 #include "ST7565R_Picture.h"
-#include "stm32f0xx_spi.h"
+#include "scheduler.h"
 #include "spi.h"
+#include <inttypes.h>
+#include "menu.h"
 
 #define DEBUG_PIN_0 GPIO_Pin_0
 #define DEBUG_PIN_1 GPIO_Pin_1
 #define DEBUG_PORT GPIOB
 
-//*****************************************************************************
+
+/*LCD defines 128x64*/
+#define MAX_8x16_LINE_SIGN 16
+
+uint8_t err_sentence[]="err!";
+marker_t empty;
+
+uint8_t column_set(uint8_t column);
+uint8_t page_adress_set(uint8_t page_nr);
+uint8_t check_sentence_size(uint8_t *sentence_ptr);
+
+
+
+
+
+static signed char  copy_sentence_to_buf(uint8_t *buffer, uint8_t *sentence);
+
+
+void symbol_changer(u8* sentence)
+{
+
+
+}
+
+void generate_alpabet(void)
+{
+
+}
+
+
+
+
+
+uint8_t page_adress_set(uint8_t page_nr)
+{
+	if(page_nr<=7)
+	{
+
+		ST7565R_Write(ST7565R_CMD, (0xB0+page_nr));
+		return 0;
+	}
+
+	return 1;
+
+
+}
+
+uint8_t column_set(uint8_t column)
+{
+
+	if(column <= LCD_MAX_COLUMN)
+	{
+
+
+		ST7565R_Write(ST7565R_CMD, ((column/16)|0x10));
+		ST7565R_Write(ST7565R_CMD, (column%16));
+		return 0;
+	}
+
+	return 1;
+}
+
+/*
+ * Function: lcd_sentence
+ *
+ * Parameters:
+ * tab - pointer to sentence
+ * ucRow - line number start from 0
+ * symb_nr - start from 0 end on 15, cell number in line to mark
+ */
+void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type )
+{
+
+    u8 i, j,k, Column_Temp, Column_L, Column_H;
+    u8 ucColumn=0;
+    u32 uiHChar;
+    u8 mark_local_flg=0;
+    static u8 mark_char=0;
+
+    mark_char=0;
+    if(mark_type != NORMAL)
+    {
+    	if(mark_type == VANISH)
+    	{
+    		mark_local_flg = 1;
+    	}
+    	else
+    	{
+    		mark_local_flg = 2;
+    		switch(mark_type)
+    		{
+    		case LOWER_LINE:
+    			mark_char =0;
+    			break;
+    		case HASH:
+    			mark_char=16;
+    			break;
+    		case FOUR_MARK:
+    			mark_char=32;
+    			break;
+    		default:
+    			mark_char=0;
+    			break;
+    		}
+    	}
+    }
+
+    k=0;
+    while(tab[k]!=0)
+    {
+    	if((tab[k]>31) && (tab[k]<((HGROM_SIZE/16)+32)))
+    	{
+    		uiHChar = (tab[k] - 32) * 16;
+    	}
+    	else
+    	{
+    		uiHChar = 0;
+    	}
+
+    	for (i = 0; i < 2; i++)
+        {
+
+            //set page address
+
+            ST7565R_Write(ST7565R_CMD, 0xb0 + i + 2 * ucRow);
+
+            Column_Temp = ucColumn * 0x08;
+            Column_H = Column_Temp & 0xf0;
+            Column_H = Column_H >> 4;
+            Column_L = Column_Temp & 0x0f;
+            ST7565R_Write(ST7565R_CMD, 0x10 + Column_H);
+            ST7565R_Write(ST7565R_CMD, 0x00 + Column_L);
+            for (j = 0; j < 8; j++)
+            {
+            	/*If this nr symbol sentence must be change*/
+            	if((symb_nr == k) &&(mark_local_flg != 0))
+            	{
+            		/*For vanish type*/
+            		if(mark_local_flg == 1)
+            		{
+            			ST7565R_Write(ST7565R_DAT, 0x00);
+
+            		}
+            		/*All case adds to exist symbol mark*/
+            		else if(mark_local_flg == 2)
+            		{
+            			ST7565R_Write(ST7565R_DAT, (MARK_SIGN[mark_char]|HCGROM[uiHChar]));
+            			++mark_char;
+            		}
+
+            	}
+            	/*No mark changes in this number of sentence symbol*/
+            	else
+            	{
+            		ST7565R_Write(ST7565R_DAT, HCGROM[uiHChar]);
+            	}
+
+                uiHChar++;
+            }
+        }
+    	ucColumn=k+1;
+    	++k;
+    }
+}
+
+
+
+
+/*put it to scheduller 100ms*/
+
+void menu_opertion(void)
+{
+	switch(main_menu_state)
+	{
+	case START_SCR:
+		break;
+
+	case CLOCK:
+		break;
+
+	case SET_PARAM:
+		menu_alphabet_500ms();
+		break;
+
+	case PROG_PERFORM:
+		break;
+
+	case STOP_PROGRAM:
+
+	default:
+		break;
+
+	}
+
+
+
+}
+
+
+
+
+
+
 //
-//! \brief Initialization GPIO
-//!
-//! \return None.
+//void screan_creator_128x64(void)
+//{
 //
-//*****************************************************************************
+//}
+////
+void menu_header_put(uint8_t *sentence_ptr)
+{
+	uint8_t lcd_buffer[] = {"                "};
+	uint8_t buffer_count;
+	uint8_t sentence_count = 0;
+	uint8_t sentence_size;
+
+	sentence_size = check_sentence_size(sentence_ptr);
+
+	if(sentence_size <= MAX_8x16_LINE_SIGN)
+	{
+			buffer_count =((MAX_8x16_LINE_SIGN-sentence_size)/2);
+			while(sentence_ptr[sentence_count]!=0)
+			{
+					lcd_buffer[buffer_count]= sentence_ptr[sentence_count];
+					++sentence_count;
+					++buffer_count;
+			}
+
+		lcd_sentence(lcd_buffer, 0,0, NORMAL);
+	}
+	else
+	{
+		lcd_sentence(err_sentence, 0,0,NORMAL);
+	}
+
+}
+
+void menu_line_put(line_operation_t line_ptr)
+{
+	uint8_t  lcd_buffer[] = {"                "};
+	signed char  char_nr;
+
+	char_nr = copy_sentence_to_buf(lcd_buffer, line_ptr.sentence_in);
+	if(-1 != char_nr)
+	{
+		char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_med);
+		if(-1 != char_nr)
+		{
+			char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_out);
+			if(-1 != char_nr)
+			{
+				lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
+				return;
+			}
+		}
+	}
+
+	lcd_sentence(err_sentence, line_ptr.line_nr, 0 ,NORMAL);
+
+}
+
+uint8_t check_sentence_size(uint8_t *sentence_ptr)
+{
+	uint8_t k=0;
+
+	while(sentence_ptr[k]!=0)
+	{
+		++k;
+		if(k>MAX_8x16_LINE_SIGN)
+		{
+			break;
+		}
+	}
+	return k;
+}
+
+/*Funct: copy_sentence_to_buf()
+ *
+ * This funct copy one sentence (table of char ended NULL)
+ * into buffer(table of char ended NULL).
+ * Func return value >0 if all sentence fir into buffer,
+ * otherwise if buffer will overflow then return -1.
+ */
+
+signed char copy_sentence_to_buf(uint8_t *buffer,uint8_t *sentence)
+{
+	uint8_t k=0;
+	while(k<127)
+	{
+		if(sentence[k]==0)
+		{
+			break;
+		}
+		else if(buffer[k]==0)
+		{
+			return -1;
+			break;
+		}
+		buffer[k]=sentence[k];
+		++k;
+	}
+	return k;
+}
+
+
+/***********************************************************************************************************************
+ **********************************************  OLD FUNCTIONS	********************************************************
+ ***********************************************************************************************************************/
+
+
 void ST7565R_GPIO_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    /* Configure SPI1 pins: SCK, MISO and MOSI -------------------------------*/
+    /* Configure SPI1 pins: SCK, MISO and MOSI */
     GPIO_InitStructure.GPIO_Pin = ST7565R_SCLK | ST7565R_SID;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
 
@@ -45,7 +350,7 @@ void ST7565R_GPIO_Init(void)
     GPIO_Init(ST7565R_PORT, &GPIO_InitStructure);
 
 }
-#if SPI_MODE==HARDWARE
+
 //*****************************************************************************
 //
 //! \brief Write one byte (SPI mode)
@@ -57,11 +362,8 @@ void ST7565R_GPIO_Init(void)
 //*****************************************************************************
 void ST7565R_SPI_Writebyte(unsigned char ucByte)
 {
-
-	spi_flush(&ucByte, 1);
+		spi_flush(&ucByte, 1);
 }
-
-#endif
 
 //*****************************************************************************
 //
@@ -74,11 +376,10 @@ void ST7565R_SPI_Writebyte(unsigned char ucByte)
 //*****************************************************************************
 void ST7565R_Delay(u32 uTime)
 {
-    u32 i, j;
+    u32 i;
 
     for (i = 0; i < uTime; i++)
-        for (j = 0; j < 1040; j++)
-            ;
+    	;
 }
 
 //*****************************************************************************
@@ -95,37 +396,7 @@ void ST7565R_Delay(u32 uTime)
 //*****************************************************************************
 void ST7565R_Write(u8 ucDatOrCmd, u8 ucData)
 {
-#if SPI_MODE==SOFTWARE
-    u8 i, uTime;
 
-    if (ucDatOrCmd == ST7565R_DAT) /* DAT */
-    {
-        ST7565R_RS_H;
-    }
-    else /* CMD */
-    {
-        ST7565R_RS_L;
-    }
-
-    for (i = 0; i < 8; i++)
-    {
-        if (ucData & 0x80)
-        {
-            ST7565R_SID_H;
-        }
-        else
-        {
-            ST7565R_SID_L;
-        }
-        ST7565R_SCLK_H;
-        while (uTime--)
-            ;
-        ST7565R_SCLK_L;
-        while (uTime--)
-            ;
-        ucData <<= 1;
-    }
-#else  //HARDWARE
     if (ucDatOrCmd == ST7565R_DAT) /* DAT */
     {
         ST7565R_RS_H;
@@ -135,7 +406,7 @@ void ST7565R_Write(u8 ucDatOrCmd, u8 ucData)
         ST7565R_RS_L;
     }
     ST7565R_SPI_Writebyte(ucData);
-#endif
+
 }
 
 //*****************************************************************************
@@ -147,42 +418,46 @@ void ST7565R_Write(u8 ucDatOrCmd, u8 ucData)
 //*****************************************************************************
 void ST7565R_Init(void)
 {
+
+
     ST7565R_DAT = dat;
     ST7565R_CMD = cmd;
+    //GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
     ST7565R_RS_L;
     ST7565R_RST_L;
     ST7565R_SID_L;
     ST7565R_SCLK_L;
     GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 
-    ST7565R_Delay(500);
-	 GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
+	systic_delay_ms(500);
+	GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
 
 
     ST7565R_GPIO_Init();
     ST7565R_RST_L;
-    ST7565R_Delay(200);
+    systic_delay_ms(200);
     ST7565R_RST_H;
 
 
     ST7565R_Write(ST7565R_CMD, 163); /*LCD bias set: 1/7 */
     ST7565R_Write(ST7565R_CMD, 161); /*ADC select: reverse */
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 192); /*Common output mode select: normal dir. */
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 47); /*Power control set to 47*/
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 0x81); /*Electronic volume mode set*/
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 30); /*Electronic volume register set to 30*/
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 36); /*Vo voltage regulator internal resistor set to 36*/
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 0x40); /*Display start line set to 0*/
-    ST7565R_Delay(5);
+    systic_delay_ms(30);
     ST7565R_Write(ST7565R_CMD, 0xaf); /*LCD ON*/
     ST7565R_Clear_Screen();
-    ST7565R_Display_ASCII(10, 64, 65); //LCD "A"
+
+    init_for_menu();
 }
 
 //*****************************************************************************
@@ -209,130 +484,9 @@ void ST7565R_Clear_Screen(void)
     }
 }
 
-//*****************************************************************************
-//
-//! \brief Display a number within HCGROM
-//!
-//! \param ucRow is row
-//! \param ucColumn is column
-//! \param ucNum is number (0-9)
-//!
-//! \return None.
-//
-//*****************************************************************************
-void ST7565R_Display_Num(u8 ucRow, u8 ucColumn, u8 ucNum)
-{
-    u8 i, j, Column_Temp, Column_L, Column_H;
 
-    ucNum = ucNum * 16;
-    for (i = 0; i < 2; i++)
-    {
 
-        //
-        //set page address,设置行地址
-        //
-        ST7565R_Write(ST7565R_CMD, 0xb0 + i + 2 * ucRow);
-        //
-        //设置列高低地址
-        //
-        Column_Temp = ucColumn * 0x08;
-        Column_H = Column_Temp & 0xf0;
-        Column_H = Column_H >> 4;
-        Column_L = Column_Temp & 0x0f;
-        ST7565R_Write(ST7565R_CMD, 0x10 + Column_H);
-        ST7565R_Write(ST7565R_CMD, 0x00 + Column_L);
-        for (j = 0; j < 8; j++)
-        {
-            ST7565R_Write(ST7565R_DAT, HCGROM[ucNum]);
-            ucNum++;
-        }
-    }
-}
-
-//*****************************************************************************
-//
-//! \brief Display a Ascii within HCGROM
-//!
-//! \param ucRow is row
-//! \param ucColumn is column
-//! \param ucAscii is Ascii
-//!
-//! \return None.
-//
-//*****************************************************************************
-void ST7565R_Display_ASCII(u8 ucRow, u8 ucColumn, u8 ucAscii)
-{
-    u8 i, j, Column_Temp, Column_L, Column_H;
-    u32 uiHChar;
-
-    //
-    //ascii转该字的数组起始位
-    //
-    uiHChar = (ucAscii - 23) * 16;
-
-    for (i = 0; i < 2; i++)
-    {
-
-        //
-        //set page address,设置行地址
-        //
-        ST7565R_Write(ST7565R_CMD, 0xb0 + i + 2 * ucRow);
-        //
-        //设置列高低地址
-        //
-        Column_Temp = ucColumn * 0x08;
-        Column_H = Column_Temp & 0xf0;
-        Column_H = Column_H >> 4;
-        Column_L = Column_Temp & 0x0f;
-        ST7565R_Write(ST7565R_CMD, 0x10 + Column_H);
-        ST7565R_Write(ST7565R_CMD, 0x00 + Column_L);
-        for (j = 0; j < 8; j++)
-        {
-            ST7565R_Write(ST7565R_DAT, HCGROM[uiHChar]);
-            uiHChar++;
-        }
-    }
-}
-
-//*****************************************************************************
-//
-//! \brief Display the Chinese
-//!
-//! \param ucRow is row
-//! \param ucColumn is column
-//! \param *pucData is string
-//!
-//! \return None.
-//
-//*****************************************************************************
-void ST7565R_Display_CN(u8 ucRow, u8 ucColumn, u8 *pucData)
-{
-    u8 i, j, Column_Temp, Column_L, Column_H;
-
-    for (i = 0; i < 2; i++)
-    {
-
-        //
-        //set page address,设置行地址
-        //
-        ST7565R_Write(ST7565R_CMD, 0xb0 + i + 2 * ucRow);
-        //
-        //设置列高低地址
-        //
-        Column_Temp = ucColumn * 0x10;
-        Column_H = Column_Temp & 0xf0;
-        Column_H = Column_H >> 4;
-        Column_L = Column_Temp & 0x0f;
-        ST7565R_Write(ST7565R_CMD, 0x10 + Column_H);
-        ST7565R_Write(ST7565R_CMD, 0x00 + Column_L);
-        for (j = 0; j < 16; j++)
-        {
-            ST7565R_Write(ST7565R_DAT, *pucData);
-            pucData++;
-        }
-    }
-}
-
+#if(0)
 
 //*****************************************************************************
 //
@@ -452,12 +606,39 @@ void ST7565R_Display_Picture(u8 *pucData)
 }
 
 
+void write_symbol(uint8_t type)
+{
+	uint8_t kol=0;
+	uint8_t pagge=0;
+
+	if(type>0)
+	{
+			for(pagge=0;pagge<8;pagge++)
+	{
+		column_set(0);
+		page_adress_set(pagge);
+		for(kol=0;kol<128;kol++)
+		{
+			ST7565R_Write(ST7565R_DAT,255 );
+		}
+	}
+	}
+	else
+	{
+		for(pagge=0;pagge<8;pagge++)
+	{
+		column_set(0);
+		page_adress_set(pagge);
+		for(kol=0;kol<128;kol++)
+		{
+			ST7565R_Write(ST7565R_DAT, 0);
+		}
+	}
+	}
 
 
 
 
-
-
-
-
+}
+#endif
 

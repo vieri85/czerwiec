@@ -46,16 +46,77 @@
 #include "stm32f0xx_rcc.h"
 #include "stm32f0xx_flash.h"
 #include "stm32f0xx_spi.h"
-#include "stm32f0xx_usart.h"
 
 
-
-enum ST7565R_CMD_DAT
+typedef enum
 {
-    cmd, dat
-} ST7565R_CMD, ST7565R_DAT;
+    cmd,
+    dat
+}ST7565_cmd_dat_t;
 
-#define u8 uint8_t
+
+/*menu state type def*/
+typedef enum
+{
+	START_SCR=0,
+	CLOCK,
+	SET_PARAM,
+	PROG_PERFORM,
+	STOP_PROGRAM
+
+}main_menu_t;
+
+
+typedef enum
+{
+	LINE_1=0,
+	LINE_2,
+	LINE_3,
+	LINE_4
+}menu_line_nr_t;
+
+
+typedef enum
+{
+	NORMAL,
+	VANISH,
+	LOWER_LINE,
+	FOUR_MARK,
+	H_BORER,
+	HASH
+}m_type;
+
+typedef struct
+{
+	/*Pointers to table contain sentences*/
+	uint8_t *sentence_in;
+	uint8_t	*sentence_med;
+	uint8_t *sentence_out;
+	/*Line number to operate: 1,2 or 3*/
+	menu_line_nr_t line_nr;
+	/*set position in whole line operation to change by mark*/
+	uint8_t mark_symb_nr;
+	/*Set type mark - NORMAL is without changes*/
+	m_type mark_type;
+
+}line_operation_t;
+
+
+
+
+typedef struct
+{
+	m_type type;
+	uint8_t symb_nr;
+
+}marker_t;
+
+ST7565_cmd_dat_t ST7565R_CMD, ST7565R_DAT;
+
+line_operation_t line_operation_1;
+
+
+#define u8 unsigned char
 #define u32 uint32_t
 //
 //don't change it
@@ -83,6 +144,7 @@ enum ST7565R_CMD_DAT
 #define ST7565R_BLK      GPIO_Pin_12
 #define ST7565R_PORT     GPIOA
 
+#define LCD_MAX_COLUMN 	128
 
 
 //*****************************************************************************
@@ -109,19 +171,22 @@ enum ST7565R_CMD_DAT
 //! ST7565R APIs
 //
 //*****************************************************************************
+extern main_menu_t main_menu_state;
 
 extern void ST7565R_Init(void);
 extern void ST7565R_Clear_Screen(void);
 extern void ST7565R_Display_Num(u8 ucRow, u8 ucColumn, u8 ucNum);
 extern void ST7565R_Display_ASCII(u8 ucRow, u8 ucColumn, u8 ucAscii);
-extern void ST7565R_Display_CN(u8 ucRow, u8 ucColumn, u8 *pucData);
-extern void ST7565R_Display_16x32_Num(u8 ucRow, u8 ucColumn, u8 ucNum);
-extern void ST7565R_Display_16x32_Num_Reverse(u8 ucRow, u8 ucColumn, u8 ucNum);
 extern void ST7565R_Display_Picture(u8 *pucData);
 extern void ST7565R_Write(u8 ucDatOrCmd, u8 ucData);
 extern unsigned char zhong[];
 extern unsigned char ST7565R_Picture[];
 extern void ST7565R_Delay(u32 uTime);
+extern void write_symbol(uint8_t type);
+extern void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type );
+extern void menu_header_put(uint8_t *sentence_ptr);
+extern void menu_line_put(line_operation_t line_ptr);
+extern void menu_opertion(void);
 //*****************************************************************************
 //
 //! @}

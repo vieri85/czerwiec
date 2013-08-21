@@ -113,10 +113,10 @@ void PendSV_Handler(void)
 }*/
 
 
-void USART2_IRQHandler(void)
-{
-	USART2_IRQHandler_com();
-}
+//void USART2_IRQHandler(void)
+//{
+//	USART2_IRQHandler_com();
+//}
 /**
   * @}
   */

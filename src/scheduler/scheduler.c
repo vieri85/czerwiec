@@ -78,20 +78,3 @@ void reset_ms_counter(void)
 	ms_delay_counter = 0;
 }
 
-void systick_init(void)
-{
-	/*SET to 1ms period*/
-	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
-    SysTick->LOAD  = 16000;      									 /* set reload register */
-    NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
-    SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
-    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
-                     SysTick_CTRL_TICKINT_Msk   |
-                     SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
-
-    systick_timer.timer_1000ms = 0;
-    systick_timer.timer_100ms = 0;
-    systick_timer.timer_10ms = 0;
-}
-
-

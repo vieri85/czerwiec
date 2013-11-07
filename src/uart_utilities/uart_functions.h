@@ -13,5 +13,6 @@
 
 extern void uart_operation(void);
 extern void uart_operation_for_LCD(void);
-
+extern void uart_send_word(uint16_t word_value);
+extern void uart_task(void);
 #endif /* UART_FUNCTIONS_H_ */

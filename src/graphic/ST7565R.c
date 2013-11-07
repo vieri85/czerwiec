@@ -20,9 +20,7 @@
 #include <inttypes.h>
 #include "menu.h"
 
-#define DEBUG_PIN_0 GPIO_Pin_0
-#define DEBUG_PIN_1 GPIO_Pin_1
-#define DEBUG_PORT GPIOB
+
 
 
 /*LCD defines 128x64*/
@@ -39,23 +37,7 @@ uint8_t check_sentence_size(uint8_t *sentence_ptr);
 
 
 
-static signed char  copy_sentence_to_buf(uint8_t *buffer, uint8_t *sentence);
-
-
-void symbol_changer(u8* sentence)
-{
-
-
-}
-
-void generate_alpabet(void)
-{
-
-}
-
-
-
-
+signed char copy_sentence_to_buf(uint8_t *buffer,uint8_t buf_size,uint8_t start_iter, uint8_t *sentence);
 
 uint8_t page_adress_set(uint8_t page_nr)
 {
@@ -205,7 +187,7 @@ void menu_opertion(void)
 		break;
 
 	case SET_PARAM:
-		menu_alphabet_500ms();
+//		menu_alphabet_500ms();
 		break;
 
 	case PROG_PERFORM:
@@ -263,27 +245,50 @@ void menu_header_put(uint8_t *sentence_ptr)
 
 void menu_line_put(line_operation_t line_ptr)
 {
-	uint8_t  lcd_buffer[] = {"                "};
-	signed char  char_nr;
+//	uint8_t  lcd_buffer[] = {"                "};
+//	signed char  char_nr;
 
-	char_nr = copy_sentence_to_buf(lcd_buffer, line_ptr.sentence_in);
-	if(-1 != char_nr)
-	{
-		char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_med);
-		if(-1 != char_nr)
-		{
-			char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_out);
-			if(-1 != char_nr)
-			{
-				lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
-				return;
-			}
-		}
-	}
+//	char_nr = copy_sentence_to_buf(lcd_buffer, line_ptr.sentence_in);
+//	if(-1 != char_nr)
+//	{
+//		char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_med);
+//		if(-1 != char_nr)
+//		{
+//			char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_out);
+//			if(-1 != char_nr)
+//			{
+//				lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
+//				return;
+//			}
+//		}
+//	}
 
 	lcd_sentence(err_sentence, line_ptr.line_nr, 0 ,NORMAL);
 
 }
+
+void menu_line_put_ext(LineOperationExtend_t line_ptr)
+{
+	uint8_t  lcd_buffer[] = {"                "};
+	uint8_t word_nr=0;
+
+	for(;word_nr <= line_ptr.max_ptr_nr;word_nr++)
+	{
+
+		if(line_ptr.word_descr[word_nr].sentence_ptr != NULL)
+		{
+
+			copy_sentence_to_buf(lcd_buffer,16,line_ptr.word_descr[word_nr].start_pos,
+				 	 	 	 	 line_ptr.word_descr[word_nr].sentence_ptr);
+		}
+
+	}
+
+	lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
+
+}
+
+
 
 uint8_t check_sentence_size(uint8_t *sentence_ptr)
 {
@@ -308,24 +313,26 @@ uint8_t check_sentence_size(uint8_t *sentence_ptr)
  * otherwise if buffer will overflow then return -1.
  */
 
-signed char copy_sentence_to_buf(uint8_t *buffer,uint8_t *sentence)
+signed char copy_sentence_to_buf(uint8_t *buffer,uint8_t buf_size,uint8_t start_iter, uint8_t *sentence)
 {
 	uint8_t k=0;
-	while(k<127)
+
+	while(start_iter<127)
 	{
 		if(sentence[k]==0)
 		{
 			break;
 		}
-		else if(buffer[k]==0)
+		else if((buffer[start_iter]==0) || (start_iter >= buf_size))
 		{
 			return -1;
 			break;
 		}
-		buffer[k]=sentence[k];
+		buffer[start_iter] = sentence[k];
 		++k;
+		++start_iter;
 	}
-	return k;
+	return start_iter;
 }
 
 
@@ -427,10 +434,10 @@ void ST7565R_Init(void)
     ST7565R_RST_L;
     ST7565R_SID_L;
     ST7565R_SCLK_L;
-    GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
+    //GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
 
 	systic_delay_ms(500);
-	GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
+	//GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
 
 
     ST7565R_GPIO_Init();

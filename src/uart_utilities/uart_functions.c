@@ -12,11 +12,20 @@
 #include "keyboard.h"
 #include "common_use.h"
 
+#define BUFF_SIZE	20U
+
+uint8_t* uart_free_buf_size(void);
+uint8_t uart_write_buf(uint8_t* data_ptr, uint8_t size);
 
 uint8_t letter=255;
 uint8_t new_receive = 0;
 
+uint8_t uart_buffor[BUFF_SIZE];
+uint8_t buf_ind_to_write = 0;
+uint8_t buf_ind_to_send = 0;
+uint8_t buf_free_size = BUFF_SIZE;
 
+uint8_t send_buf[]="      ";
 
 
 /*OPIS uart_operation()
@@ -111,6 +120,29 @@ void uart_operation(void)
 	  }
 }
 
+void uart_send_word(uint16_t word_value)
+{
+	static uint16_t hist_value = 0;
+	uint8_t index = 5;
+
+
+	if(hist_value != word_value)
+	{
+		hist_value = word_value;
+		while(index>0)
+		{
+			--index;
+			send_buf[index] = ((word_value%10) + 0x30);
+			word_value/=10;
+		}
+
+		/*after set all ascii sign represent word_value will be set enter char in sedn buffer*/
+		send_buf[5] = 0x0D;
+
+		(void)uart_write_buf(send_buf, 6);
+	}
+
+}
 
 
 void uart_operation_for_LCD(void)
@@ -167,6 +199,89 @@ void USART2_IRQHandler(void)
    //USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 
 }
+
+
+
+
+void uart_task(void)
+{
+
+	if(buf_free_size < BUFF_SIZE)
+	{
+		USART_SendData(USART2, uart_buffor[buf_ind_to_send]);
+		/*UWAGA MOZLIWY BUG!!!!*/
+		if((BUFF_SIZE-1) <= buf_ind_to_send)
+		{
+			buf_ind_to_send = 0;
+		}
+		else
+		{
+			++buf_ind_to_send;
+		}
+
+		++buf_free_size;
+	}
+	else
+	{
+		/*Nothing to send*/
+	}
+
+}
+
+uint8_t* uart_free_buf_size(void)
+{
+	return &buf_free_size;
+}
+
+
+uint8_t uart_write_buf(uint8_t* data_ptr, uint8_t size)
+{
+	uint8_t ret = 0;
+	uint8_t *free_size_ptr = uart_free_buf_size();
+	uint8_t indx = 0;
+
+	if(free_size_ptr[0] >= size)
+	{
+		while( indx < size )
+		{
+			uart_buffor[buf_ind_to_write] = data_ptr[indx];
+			++buf_ind_to_write;
+			if( ((buf_ind_to_write) >= BUFF_SIZE) )
+			{
+				buf_ind_to_write = 0;
+			}
+			++indx;
+		}
+
+		free_size_ptr[0]-=size;
+	}
+	else
+	{
+		ret = 1;
+	}
+	/*enable uart interrupt here!!!!*/
+	return ret;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

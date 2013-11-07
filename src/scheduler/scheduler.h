@@ -42,7 +42,6 @@ extern timer_scheduler_t systick_timer;
 
 
 extern void systic_delay_ms(uint16_t delay_ms_count);
-extern void systick_init(void);
 
 
 #endif /* SCHEDULER_H_ */

@@ -47,6 +47,9 @@ CSRC = $(sort \
    src/keyboard/keyboard.c \
    src/menu/menu.c \
    src/uart_utilities/uart_functions.c \
+   src/dds_generator/dds.c \
+   src/Timer/timer.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_tim.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)

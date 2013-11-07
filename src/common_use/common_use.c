@@ -11,7 +11,7 @@
 
 
 /*Global variable*/
-static uint8_t RDBI_adres=55;
+//static uint8_t RDBI_adres=55;
 
 uint8_t BCD_TO_DEC(uint8_t* bufor,uint8_t *dec)
 {

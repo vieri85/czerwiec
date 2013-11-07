@@ -1,22 +1,22 @@
 /*
  * init.h
  *
- *  Created on: 23-05-2013
+ *  Created on: Jun 26, 2013
  *      Author: Bono
  */
 
 #ifndef INIT_H_
 #define INIT_H_
+
 #include <stdint.h>
 #include "stm32f0xx_misc.h"
 #include "scheduler.h"
 #include "ST7565R.h"
-#include "common_use.h"
-
-extern void usart_init(void);
-extern void init_gpio(void);
-extern void debug_pin_init(void);
-extern void init_devices(void);
+#include "stm32f0xx_usart.h"
+#include "stm32f0xx_rcc.h"
+#include "stm32f0xx_gpio.h"
+#include "stm32f0xx_tim.h"
+#include "dds.h"
 
 /* STM32F0_DISCOVERY board definitions */
 #define LED_PORT GPIOC
@@ -46,4 +46,9 @@ extern void init_devices(void);
 #define BIT13	(1<<13)
 #define BIT14	(1<<14)
 #define BIT15	(1<<15)
+
+
+extern void init_devices(void);
+
+
 #endif /* INIT_H_ */

@@ -7,6 +7,8 @@
 
 #include "task_functions.h"
 #include "uart_functions.h"
+#include "timer.h"
+#include "dds.h"
 
 uint8_t timer_flag_1s=0;
 
@@ -17,40 +19,47 @@ void number(line_operation_t *line_operation_ptr);
 
 void task_every_1ms(void)
 {
-	if(0 != (DEBUG_PORT->ODR & DEBUG_PIN_1))
-	{
-		GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_1);
-	}
-	else
-	{
-		GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_1);
-	}
+
 	//SPI_SendData8(SPI1, 255);
+
 }
 
 void task_every_10ms(void)
 {
-	;
+	uint8_t q;
+	uint8_t a;
+	uart_task();
+	for(q=20;q>0;q--)
+	{
+
+			GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_0);
+			delay_us(100);
+			GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_0);
+		    delay_us(100);
+	}
+
 
 }
 
 void task_every_100ms(void)
 {
-	menu_opertion();
-	//menu_main();
-	uart_operation_for_LCD();
-	//menu_line_put(line_operation_1);
+	menu_main();
+
+
 }
 
 void task_every_1000ms(void)
 {
-	static uint8_t dec_number=0;
+	static uint32_t freq=1;
 
-	dec_number++;
+
+	freq++;
 
 		timer_flag_1s = 1;
-		number(&line_operation_1);
+		//number(&line_operation_1);
+		//uart_send_word(read_encoder());
 
+		set_frequency(freq);
 }
 
 

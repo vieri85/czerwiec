@@ -46,7 +46,13 @@
 #include "stm32f0xx_rcc.h"
 #include "stm32f0xx_flash.h"
 #include "stm32f0xx_spi.h"
+#include "stdlib_2.h"
 
+#define MAX_LINE_SENTENCE  6
+
+#define DEBUG_PIN_0 GPIO_Pin_0
+#define DEBUG_PIN_1 GPIO_Pin_1
+#define DEBUG_PORT GPIOB
 
 typedef enum
 {
@@ -92,7 +98,7 @@ typedef struct
 	uint8_t *sentence_in;
 	uint8_t	*sentence_med;
 	uint8_t *sentence_out;
-	/*Line number to operate: 1,2 or 3*/
+	/*Line number to operate: 1,2,3 or 4*/
 	menu_line_nr_t line_nr;
 	/*set position in whole line operation to change by mark*/
 	uint8_t mark_symb_nr;
@@ -101,7 +107,26 @@ typedef struct
 
 }line_operation_t;
 
+typedef struct
+{
+	uint8_t* sentence_ptr;
+	uint8_t start_pos;
 
+}WordDescr_t;
+
+
+typedef struct
+{
+	WordDescr_t word_descr[MAX_LINE_SENTENCE];
+	/*Line number to operate: 1,2,3 or 4*/
+	menu_line_nr_t line_nr;
+	/*set position in whole line operation to change by mark*/
+	uint8_t mark_symb_nr;
+	/*Set type mark - NORMAL is without changes*/
+	m_type mark_type;
+	uint8_t max_ptr_nr;
+
+}LineOperationExtend_t;
 
 
 typedef struct
@@ -177,6 +202,9 @@ extern void ST7565R_Init(void);
 extern void ST7565R_Clear_Screen(void);
 extern void ST7565R_Display_Num(u8 ucRow, u8 ucColumn, u8 ucNum);
 extern void ST7565R_Display_ASCII(u8 ucRow, u8 ucColumn, u8 ucAscii);
+extern void ST7565R_Display_CN(u8 ucRow, u8 ucColumn, u8 *pucData);
+extern void ST7565R_Display_16x32_Num(u8 ucRow, u8 ucColumn, u8 ucNum);
+extern void ST7565R_Display_16x32_Num_Reverse(u8 ucRow, u8 ucColumn, u8 ucNum);
 extern void ST7565R_Display_Picture(u8 *pucData);
 extern void ST7565R_Write(u8 ucDatOrCmd, u8 ucData);
 extern unsigned char zhong[];
@@ -186,7 +214,9 @@ extern void write_symbol(uint8_t type);
 extern void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type );
 extern void menu_header_put(uint8_t *sentence_ptr);
 extern void menu_line_put(line_operation_t line_ptr);
-extern void menu_opertion(void);
+
+
+extern void menu_line_put_ext(LineOperationExtend_t line_ptr);
 //*****************************************************************************
 //
 //! @}

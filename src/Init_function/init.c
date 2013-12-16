@@ -7,9 +7,10 @@
 
 
 #include "init.h"
+#include "keyboard.h"
+#include "nvm.h"
 
-
-
+void init_keyboard(void);
 
 typedef union
 {
@@ -308,14 +309,14 @@ void init_encoder_tim1(void)
 
 	timer_init.TIM_ClockDivision = TIM_CKD_DIV1;
 	timer_init.TIM_CounterMode = TIM_CounterMode_Up;
-	timer_init.TIM_Period = 0xFFFF;
+	timer_init.TIM_Period = 0x000F;
 	timer_init.TIM_Prescaler = 0;
 	/*Used only in TIM1*/
 	timer_init.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM1, &timer_init);
 
 	TIM_EncoderInterfaceConfig(TIM1, TIM_EncoderMode_TI1,TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
-	TIM_SetAutoreload(TIM1, 0xFFFF);
+	TIM_SetAutoreload(TIM1, 0x000F);
 	TIM_Cmd(TIM1, ENABLE);
 
 }
@@ -326,7 +327,18 @@ void init_DMA(void)
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1,ENABLE);
 }
 
+void init_keyboard(void)
+{
+	  GPIO_InitTypeDef        GPIO_InitStructure;
+//	  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 
+	  GPIO_InitStructure.GPIO_Pin = (KEYBOARD_ENTER|KEYBOARD_ESC|KEYBOARD_LEFT|KEYBOARD_RIGHT);
+	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	  GPIO_Init(KEYBOARD_PORT, &GPIO_InitStructure);
+}
 
 
 void init_devices(void)
@@ -339,4 +351,6 @@ void init_devices(void)
 	DAC_init();
 	init_encoder_tim1();
 	init_DDS();
+	init_keyboard();
+	NVM_Init();
 }

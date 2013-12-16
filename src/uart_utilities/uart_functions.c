@@ -10,10 +10,10 @@
 #include "inttypes.h"
 #include "ST7565R.h"
 #include "keyboard.h"
-#include "common_use.h"
 
 #define BUFF_SIZE	20U
 
+uint8_t BCD_TO_DEC2(uint8_t* bufor,u8 *dec);
 uint8_t* uart_free_buf_size(void);
 uint8_t uart_write_buf(uint8_t* data_ptr, uint8_t size);
 
@@ -38,7 +38,7 @@ uint8_t send_buf[]="      ";
  *
  */
 
-
+#if 0
 void uart_operation(void)
 {
 	static uint8_t i, bufor[5],k,dec_number;
@@ -88,7 +88,7 @@ void uart_operation(void)
 			if(k>=3)
 			{
 
-				 if(0 == BCD_TO_DEC(bufor,&dec_number))
+				 if(0 == BCD_TO_DEC2(bufor,&dec_number))
 				 {
 					 USART_SendData(USART2, 0x74);	//send "t"
 					 ST7565R_Delay(10);
@@ -119,7 +119,7 @@ void uart_operation(void)
 
 	  }
 }
-
+#endif
 void uart_send_word(uint16_t word_value)
 {
 	static uint16_t hist_value = 0;
@@ -200,6 +200,20 @@ void USART2_IRQHandler(void)
 
 }
 
+uint8_t BCD_TO_DEC2(uint8_t* bufor,u8 *dec)
+{
+	u8 ret=1;
+	uint16_t temp=0;
+		temp=bufor[0] * 100;
+		temp+=bufor[1]*10;
+		temp+=bufor[2];
+		if(temp<256)
+		{
+			*dec = (u8)temp;
+			ret=0;
+		}
+	return ret;
+}
 
 
 

@@ -9,9 +9,12 @@
 #include "uart_functions.h"
 #include "timer.h"
 #include "dds.h"
+#include "keyboard.h"
+#include "menu.h"
 
 uint8_t timer_flag_1s=0;
-
+static uint16_t enk_old=0;
+uint16_t licznik=0;
 
 
 void number(line_operation_t *line_operation_ptr);
@@ -20,30 +23,28 @@ void number(line_operation_t *line_operation_ptr);
 void task_every_1ms(void)
 {
 
-	//SPI_SendData8(SPI1, 255);
+	uart_task();
 
 }
 
 void task_every_10ms(void)
 {
-	uint8_t q;
-	uint8_t a;
-	uart_task();
-	for(q=20;q>0;q--)
-	{
 
-			GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_0);
-			delay_us(100);
-			GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_0);
-		    delay_us(100);
-	}
 
 
 }
 
 void task_every_100ms(void)
 {
+
+
 	menu_main();
+	check_button();
+//	if(enk_old != read_encoder())
+//	{
+//		enk_old = read_encoder();
+//		(void)uart_write_buf(&enk_old, sizeof(enk_old));
+//	}
 
 
 }
@@ -51,15 +52,29 @@ void task_every_100ms(void)
 void task_every_1000ms(void)
 {
 	static uint32_t freq=1;
-
+	static uint8_t ii2=0;
 
 	freq++;
 
 		timer_flag_1s = 1;
-		//number(&line_operation_1);
-		//uart_send_word(read_encoder());
 
-		set_frequency(freq);
+
+
+//		set_frequency(freq);
+				  if (ii2 == 1)
+				  {
+
+					  LED_PORT->BSRR = LED1;
+					  ii2 = 0;
+
+				  }
+				  else if (ii2 == 0)
+				  {
+					  ii2 = 1;
+					  LED_PORT->BRR = LED1;
+
+
+				  }
 }
 
 

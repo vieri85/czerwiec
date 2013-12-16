@@ -8,7 +8,14 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
+typedef enum
+{
+	INCREMENT= 0,
+	DECREMENT,
+	STABLE
+}EnkoderState_t;
+
 extern uint16_t read_encoder(void);
-extern void reset_encoder(void);
+extern void set_encoder(uint16_t new_value);
 
 #endif /* TIMER_H_ */

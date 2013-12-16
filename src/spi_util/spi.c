@@ -6,7 +6,7 @@
  */
 #include "init.h"
 #include "spi.h"
-
+ #include "stdint.h"
 uint8_t SPI_TX_free = RESET;
 uint8_t spi_data_au[MAX_SPI_BUFFOR];
 static uint8_t current_vector = 0;

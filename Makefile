@@ -50,6 +50,9 @@ CSRC = $(sort \
    src/dds_generator/dds.c \
    src/Timer/timer.c \
    inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_tim.c \
+   src/nvm/nvm_init.c \
+   src/nvm/nvm.c \
+   inc/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_flash.c \
    )
 ###.\src\system_stm32f0xx.c#################################################################################################
 # INSERT HERE C++ SOURCES WHICH MUST BE COMPILED (AUTOMATIC ADDS PATHS AS HEADER PATHS)

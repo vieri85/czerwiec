@@ -26,7 +26,7 @@ uint16_t read_encoder(void)
 	return TIM1->CNT;
 }
 
-void reset_encoder(void)
+void set_encoder(uint16_t new_value)
 {
-	TIM1->CNT = 0;
+	TIM1->CNT =(__IO uint32_t) new_value;
 }

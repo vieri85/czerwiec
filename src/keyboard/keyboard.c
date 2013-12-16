@@ -13,42 +13,6 @@ void Button_Set(switch_t switch_nr)
 	global_button_state = switch_nr;
 }
 
-/*After read status some button will be clear
- *
- */
-//buton_state_t read_button_status(switch_t switch_nr)
-//{
-//	uint8_t ret;
-//	switch(switch_nr)
-//	{
-//	case ENTER:
-//		ret = global_button_state.button.enter;
-//		break;
-//	case ESC:
-//		ret = global_button_state.button.esc;
-//		break;
-//	case LEFT:
-//		ret = global_button_state.button.left;
-//		break;
-//	case RIGHT:
-//		ret = global_button_state.button.right;
-//		break;
-//	default:
-//		/*Wrong request*/
-//		ret = UNDEF;
-//		break;
-//	}
-//	/*After read some button state and it was SET
-//	 * then all other will be reset to avoid unpredictable
-//	 * behaviour of change menu
-//	 */
-//	if(ret == 1)
-//	{
-//		global_button_state.all = 0;
-//	}
-//
-//	return ret;
-//}
 
 switch_t read_any_button(void)
 {
@@ -57,4 +21,24 @@ switch_t read_any_button(void)
    global_button_state = 0;
 
    return ret;
+}
+
+void check_button(void)
+{
+	if(0 == GPIO_ReadInputDataBit(KEYBOARD_PORT, KEYBOARD_ENTER))
+	{
+		Button_Set(ENTER);
+	}
+	else if(0 == GPIO_ReadInputDataBit(KEYBOARD_PORT, KEYBOARD_ESC))
+	{
+		Button_Set(ESC);
+	}
+	else if(0 == GPIO_ReadInputDataBit(KEYBOARD_PORT, KEYBOARD_LEFT))
+	{
+		Button_Set(LEFT);
+	}
+	else if(0 == GPIO_ReadInputDataBit(KEYBOARD_PORT, KEYBOARD_RIGHT))
+	{
+		Button_Set(RIGHT);
+	}
 }

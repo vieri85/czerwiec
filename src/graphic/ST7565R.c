@@ -88,7 +88,7 @@ void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type )
     mark_char=0;
     if(mark_type != NORMAL)
     {
-    	if(mark_type == VANISH)
+    	if((mark_type == VANISH)||(mark_type == INVERT))
     	{
     		mark_local_flg = 1;
     	}
@@ -143,10 +143,20 @@ void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type )
             	/*If this nr symbol sentence must be change*/
             	if((symb_nr == k) &&(mark_local_flg != 0))
             	{
-            		/*For vanish type*/
+
             		if(mark_local_flg == 1)
             		{
-            			ST7565R_Write(ST7565R_DAT, 0x00);
+            			/*For vanish type*/
+            			if(mark_type == VANISH)
+            			{
+            				ST7565R_Write(ST7565R_DAT, 0x00);
+            			}
+            			/*For invert type*/
+            			else
+            			{
+            				ST7565R_Write(ST7565R_DAT, (~HCGROM[uiHChar]));
+            			}
+
 
             		}
             		/*All case adds to exist symbol mark*/
@@ -155,6 +165,7 @@ void lcd_sentence(uint8_t *tab, uint8_t ucRow, u8 symb_nr, m_type mark_type )
             			ST7565R_Write(ST7565R_DAT, (MARK_SIGN[mark_char]|HCGROM[uiHChar]));
             			++mark_char;
             		}
+
 
             	}
             	/*No mark changes in this number of sentence symbol*/
@@ -245,23 +256,27 @@ void menu_header_put(uint8_t *sentence_ptr)
 
 void menu_line_put(line_operation_t line_ptr)
 {
-//	uint8_t  lcd_buffer[] = {"                "};
-//	signed char  char_nr;
+	uint8_t  lcd_buffer[] = {"                         "};
+	signed char  char_nr;
+	uint8_t local;
 
-//	char_nr = copy_sentence_to_buf(lcd_buffer, line_ptr.sentence_in);
-//	if(-1 != char_nr)
-//	{
-//		char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_med);
-//		if(-1 != char_nr)
-//		{
-//			char_nr += copy_sentence_to_buf(&lcd_buffer[char_nr], line_ptr.sentence_out);
-//			if(-1 != char_nr)
-//			{
-//				lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
-//				return;
-//			}
-//		}
-//	}
+	local = sizeof(lcd_buffer);
+	char_nr = copy_sentence_to_buf(lcd_buffer, sizeof(lcd_buffer), 0, line_ptr.sentence_in);
+	if(-1 != char_nr)
+	{
+		local = (sizeof(lcd_buffer)-(uint8_t)char_nr);
+		char_nr = copy_sentence_to_buf(lcd_buffer,sizeof(lcd_buffer),(uint8_t)char_nr, line_ptr.sentence_med);
+		if(-1 != char_nr)
+		{
+			local = (sizeof(lcd_buffer)-(uint8_t)char_nr);
+			char_nr = copy_sentence_to_buf(lcd_buffer, sizeof(lcd_buffer), (uint8_t)char_nr, line_ptr.sentence_out);
+			if(-1 != char_nr)
+			{
+				lcd_sentence(lcd_buffer, line_ptr.line_nr, line_ptr.mark_symb_nr ,line_ptr.mark_type);
+				return;
+			}
+		}
+	}
 
 	lcd_sentence(err_sentence, line_ptr.line_nr, 0 ,NORMAL);
 

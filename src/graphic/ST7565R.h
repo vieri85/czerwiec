@@ -89,7 +89,8 @@ typedef enum
 	LOWER_LINE,
 	FOUR_MARK,
 	H_BORER,
-	HASH
+	HASH,
+	INVERT
 }m_type;
 
 typedef struct
@@ -166,7 +167,6 @@ line_operation_t line_operation_1;
 #define ST7565R_SID      GPIO_Pin_7
 #define ST7565R_SCLK     GPIO_Pin_5
 
-#define ST7565R_BLK      GPIO_Pin_12
 #define ST7565R_PORT     GPIOA
 
 #define LCD_MAX_COLUMN 	128
@@ -187,8 +187,6 @@ line_operation_t line_operation_1;
 #define ST7565R_SCLK_L   GPIO_ResetBits(ST7565R_PORT,ST7565R_SCLK)
 #define ST7565R_CS_H     GPIO_SetBits(ST7565R_PORT,ST7565R_CS)
 #define ST7565R_CS_L     GPIO_ResetBits(ST7565R_PORT,ST7565R_CS)
-#define ST7565R_BLK_H    GPIO_SetBits(ST7565R_PORT,ST7565R_BLK)
-#define ST7565R_BLK_L    GPIO_ResetBits(ST7565R_PORT,ST7565R_BLK)
 
 
 //*****************************************************************************

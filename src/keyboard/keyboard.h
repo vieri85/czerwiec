@@ -8,6 +8,13 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 #include <stdint.h>
+#include "stm32f0xx_gpio.h"
+
+#define KEYBOARD_PORT 	GPIOA
+#define KEYBOARD_ENTER	GPIO_Pin_12
+#define KEYBOARD_ESC	GPIO_Pin_11
+#define KEYBOARD_LEFT   GPIO_Pin_15
+#define KEYBOARD_RIGHT	GPIO_Pin_10
 
 typedef enum
 {
@@ -41,8 +48,11 @@ typedef enum
 }buton_state_t;
 
 
+
+
 extern buton_state_t read_button_status(switch_t switch_nr);
 extern void Button_Set(switch_t switch_nr);
 extern switch_t read_any_button(void);
+extern void check_button(void);
 
 #endif /* KEYBOARD_H_ */

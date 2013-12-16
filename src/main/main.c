@@ -22,14 +22,12 @@
 */
 
 /* Includes */
-//#include <stddef.h>
 #include "task_functions.h"
 #include "ST7565R.h"
-#include "init.h"
 #include "uart_functions.h"
 #include "spi.h"
-//#include <stdlib.h>
-
+#include "syscalls.h"
+#include "init.h"
 /* Private typedef */
 
 /* Private define  */
@@ -39,7 +37,6 @@
 
 
 /* Private function prototypes */
-void init_general_gpio_UART(void);
 
 
 /* Private functions */
@@ -102,9 +99,8 @@ int main(void)
 
   ii = 0;
 
-
   init_gpio();
-
+  SystemCoreClockUpdate();
 
   //INIT SPI AND OTHERS
  init_devices();
@@ -113,34 +109,25 @@ int main(void)
   while (1)
   {
 
-
-//		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
-//		if(GPIO_ReadInputDataBit(DEBUG_PORT, DEBUG_PIN_0))
-//			GPIO_ResetBits(DEBUG_PORT, DEBUG_PIN_0);
-//		else
-//			GPIO_SetBits(DEBUG_PORT, DEBUG_PIN_0);
-
-
 	  if (check_timerFlag())
 	  {
 		  reset_timerFlag();
 		  ii++;
 
 		  /* Toggle LED1 */
-		  if (ii == 1)
-		  {
-			  //lcd_sentence(napis_2, 3);//sizeof(napis_2));
-			  //menu_header_put(napis_2);
-			  LED_PORT->BSRR = LED1;
-
-		  }
-		  else if (ii == 2)
-		  {
-			  ii = 0;
-			  LED_PORT->BRR = LED1;
-			  //menu_header_put(napis_3);
-
-		  }
+//		  if (ii == 1)
+//		  {
+//
+//			  LED_PORT->BSRR = LED1;
+//
+//		  }
+//		  else if (ii == 2)
+//		  {
+//			  ii = 0;
+//			  LED_PORT->BRR = LED1;
+//			  //menu_header_put(napis_3);
+//
+//		  }
 	  }
       if(GPIO_ReadInputDataBit(KEY_PORT, KEY))
 	  {
